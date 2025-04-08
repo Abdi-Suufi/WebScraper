@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selectDirectory').addEventListener('click', selectDirectory);
     document.getElementById('searchInterval').addEventListener('change', updateInterval);
     
+    // Enter key handlers for input fields
+    document.getElementById('newJobType').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addJobType();
+    });
+    
+    document.getElementById('newLocation').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addLocation();
+    });
+    
     // Set up IPC listeners
     ipcRenderer.on('current-config', (event, config) => {
         updateConfigUI(config);
@@ -26,8 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateJobList(currentJobs);
             document.getElementById('totalJobs').textContent = currentJobs.length;
             document.getElementById('newJobs').textContent = result.newJobsCount;
-            document.getElementById('statusText').textContent = 'Search completed';
-            document.getElementById('statusText').style.color = '#27ae60';
+            
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = 'Search completed';
+            statusText.className = 'completed';
             
             // If this was an automatic search, schedule the next one
             if (autoSearchInterval) {
@@ -35,9 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(autoSearchInterval);
                 autoSearchInterval = setInterval(startSearch, interval * 60 * 1000);
             }
+            
+            // Show notification for new jobs
+            if (result.newJobsCount > 0) {
+                showNotification(`Found ${result.newJobsCount} new job(s)!`);
+            }
         } else {
-            document.getElementById('statusText').textContent = 'Error: ' + result.error;
-            document.getElementById('statusText').style.color = '#e74c3c';
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = 'Error';
+            statusText.className = 'error';
+            console.error('Search error:', result.error);
         }
     });
     
@@ -45,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.success) {
             updateConfigUI(result.config);
         } else {
-            alert('Error updating config: ' + result.error);
+            showNotification('Error updating configuration', 'error');
         }
     });
     
@@ -63,8 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function startSearch() {
-    document.getElementById('statusText').textContent = 'Searching...';
-    document.getElementById('statusText').style.color = '#f39c12';
+    const statusText = document.getElementById('statusText');
+    statusText.textContent = 'Searching...';
+    statusText.className = 'searching';
+    
+    // Apply pulse animation to button
+    const startButton = document.getElementById('startSearch');
+    startButton.classList.add('animate-pulse');
+    setTimeout(() => startButton.classList.remove('animate-pulse'), 2000);
     
     // Update config from UI
     const newConfig = {
@@ -82,6 +106,7 @@ function startSearch() {
     if (!autoSearchInterval) {
         const interval = parseInt(document.getElementById('searchInterval').value) || 60;
         autoSearchInterval = setInterval(startSearch, interval * 60 * 1000);
+        showNotification(`Auto search enabled. Will search every ${interval} minutes.`);
     }
 }
 
@@ -89,7 +114,12 @@ function stopAutoSearch() {
     if (autoSearchInterval) {
         clearInterval(autoSearchInterval);
         autoSearchInterval = null;
-        document.getElementById('statusText').textContent = 'Auto search stopped';
+        
+        const statusText = document.getElementById('statusText');
+        statusText.textContent = 'Auto search stopped';
+        statusText.className = '';
+        
+        showNotification('Auto search stopped');
     }
 }
 
@@ -115,7 +145,7 @@ function updateConfigUI(config) {
         item.className = 'list-item';
         item.innerHTML = `
             <span>${jobType}</span>
-            <button class="remove-job-type" data-jobtype="${jobType}">×</button>
+            <button class="remove-job-type" data-jobtype="${jobType}" title="Remove job type">×</button>
         `;
         jobTypesList.appendChild(item);
     });
@@ -124,7 +154,9 @@ function updateConfigUI(config) {
     document.querySelectorAll('.remove-job-type').forEach(button => {
         button.addEventListener('click', (e) => {
             e.stopPropagation();
-            updateConfig({ removeJobType: button.dataset.jobtype });
+            const jobType = button.dataset.jobtype;
+            updateConfig({ removeJobType: jobType });
+            showNotification(`Removed job type: ${jobType}`);
         });
     });
     
@@ -136,7 +168,7 @@ function updateConfigUI(config) {
         item.className = 'list-item';
         item.innerHTML = `
             <span>${location}</span>
-            <button class="remove-location" data-location="${location}">×</button>
+            <button class="remove-location" data-location="${location}" title="Remove location">×</button>
         `;
         locationsList.appendChild(item);
     });
@@ -145,7 +177,9 @@ function updateConfigUI(config) {
     document.querySelectorAll('.remove-location').forEach(button => {
         button.addEventListener('click', (e) => {
             e.stopPropagation();
-            updateConfig({ removeLocation: button.dataset.location });
+            const location = button.dataset.location;
+            updateConfig({ removeLocation: location });
+            showNotification(`Removed location: ${location}`);
         });
     });
 }
@@ -153,16 +187,20 @@ function updateConfigUI(config) {
 function addJobType() {
     const input = document.getElementById('newJobType');
     if (input.value.trim()) {
-        updateConfig({ addJobType: input.value.trim() });
+        const jobType = input.value.trim();
+        updateConfig({ addJobType: jobType });
         input.value = '';
+        showNotification(`Added job type: ${jobType}`);
     }
 }
 
 function addLocation() {
     const input = document.getElementById('newLocation');
     if (input.value.trim()) {
-        updateConfig({ addLocation: input.value.trim() });
+        const location = input.value.trim();
+        updateConfig({ addLocation: location });
         input.value = '';
+        showNotification(`Added location: ${location}`);
     }
 }
 
@@ -178,6 +216,7 @@ function updateInterval() {
     if (autoSearchInterval) {
         clearInterval(autoSearchInterval);
         autoSearchInterval = setInterval(startSearch, interval * 60 * 1000);
+        showNotification(`Search interval updated to ${interval} minutes`);
     }
 }
 
@@ -187,12 +226,26 @@ function updateJobList(jobs) {
     
     jobs.forEach(job => {
         const item = document.createElement('div');
-        item.className = `job-item ${job.isNew ? 'new' : ''}`;
+        item.className = `job-item ${job.isNew ? 'new fade-in' : ''}`;
+        
+        // Determine source icon
+        let sourceIcon = '';
+        if (job.source === 'Indeed') {
+            sourceIcon = '<i class="fas fa-briefcase text-indigo-500 mr-2"></i>';
+        } else if (job.source === 'LinkedIn') {
+            sourceIcon = '<i class="fab fa-linkedin text-blue-600 mr-2"></i>';
+        } else if (job.source === 'Glassdoor') {
+            sourceIcon = '<i class="fas fa-door-open text-green-600 mr-2"></i>';
+        }
+        
+        // Format with 6-column grid (matching header)
         item.innerHTML = `
-            <div><a href="#" class="job-link" data-link="${job.link}">${job.title}</a></div>
-            <div>${job.company}</div>
-            <div>${job.location}</div>
-            <div>${job.source}</div>
+            <div class="col-span-2 truncate">
+                <a href="#" class="job-link" data-link="${job.link}">${job.title}</a>
+            </div>
+            <div class="truncate">${job.company}</div>
+            <div class="truncate">${job.location}</div>
+            <div>${sourceIcon}${job.source}</div>
             <div>${job.isNew ? '<span class="new-badge">NEW</span>' : ''}</div>
         `;
         jobList.appendChild(item);
@@ -205,4 +258,27 @@ function updateJobList(jobs) {
             require('electron').shell.openExternal(link.dataset.link);
         });
     });
+}
+
+// Simple notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-500 ${
+        type === 'error' 
+            ? 'bg-red-100 text-red-800 border-l-4 border-red-500' 
+            : 'bg-indigo-100 text-indigo-800 border-l-4 border-indigo-500'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    // Fade out and remove after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
 }

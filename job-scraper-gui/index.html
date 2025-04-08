@@ -2,85 +2,146 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Job Scraper</title>
+    <title>Job Scout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Job Scraper</h1>
-            <div class="controls">
-                <button id="startSearch">Start Search</button>
-                <button id="stopSearch">Stop Auto Search</button>
-                <div class="search-status">Status: <span id="statusText">Ready</span></div>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="flex flex-col h-screen">
+        <!-- Header/Navbar -->
+        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-search-dollar text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">Job Scout</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="startSearch" class="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow flex items-center">
+                        <i class="fas fa-play mr-2"></i> Start Search
+                    </button>
+                    <button id="stopSearch" class="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow flex items-center">
+                        <i class="fas fa-stop mr-2"></i> Stop Auto Search
+                    </button>
+                    <div class="text-white">
+                        Status: <span id="statusText" class="font-semibold">Ready</span>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="config-panel">
-                <h2>Configuration</h2>
+        <!-- Main Content -->
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Configuration Panel -->
+            <div class="w-80 bg-white shadow-lg p-5 overflow-y-auto">
+                <h2 class="text-lg font-bold text-indigo-700 mb-5 flex items-center">
+                    <i class="fas fa-cog mr-2"></i> Configuration
+                </h2>
                 
-                <div class="form-group">
-                    <label for="searchInterval">Search Interval (minutes):</label>
-                    <input type="number" id="searchInterval" min="1" value="60">
+                <div class="mb-5">
+                    <label for="searchInterval" class="block text-sm font-medium text-gray-700 mb-1">Search Interval (minutes):</label>
+                    <input type="number" id="searchInterval" min="1" value="60" 
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 
-                <div class="form-group">
-                    <label for="saveDirectory">Save Directory:</label>
-                    <div class="directory-selector">
-                        <input type="text" id="saveDirectory" readonly>
-                        <button id="selectDirectory">Browse</button>
+                <div class="mb-5">
+                    <label for="saveDirectory" class="block text-sm font-medium text-gray-700 mb-1">Save Directory:</label>
+                    <div class="flex">
+                        <input type="text" id="saveDirectory" readonly 
+                               class="flex-1 border border-gray-300 rounded-l-md px-3 py-2 bg-gray-50">
+                        <button id="selectDirectory" 
+                                class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-r-md transition-colors">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Job Types:</label>
-                    <div class="list-container" id="jobTypesList"></div>
-                    <div class="add-item">
-                        <input type="text" id="newJobType" placeholder="New job type">
-                        <button id="addJobType">Add</button>
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Job Types:</label>
+                    <div id="jobTypesList" class="border border-gray-300 rounded-md max-h-32 overflow-y-auto mb-2 bg-gray-50">
+                        <!-- Job types will be filled dynamically -->
+                    </div>
+                    <div class="flex">
+                        <input type="text" id="newJobType" placeholder="New job type" 
+                               class="flex-1 border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="addJobType" 
+                                class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-r-md transition-colors">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Locations:</label>
-                    <div class="list-container" id="locationsList"></div>
-                    <div class="add-item">
-                        <input type="text" id="newLocation" placeholder="New location">
-                        <button id="addLocation">Add</button>
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Locations:</label>
+                    <div id="locationsList" class="border border-gray-300 rounded-md max-h-32 overflow-y-auto mb-2 bg-gray-50">
+                        <!-- Locations will be filled dynamically -->
+                    </div>
+                    <div class="flex">
+                        <input type="text" id="newLocation" placeholder="New location" 
+                               class="flex-1 border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="addLocation" 
+                                class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-r-md transition-colors">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Sources:</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="source" value="indeed" checked> Indeed</label>
-                        <label><input type="checkbox" name="source" value="linkedin" checked> LinkedIn</label>
-                        <label><input type="checkbox" name="source" value="glassdoor" checked> Glassdoor</label>
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sources:</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="source" value="indeed" checked class="mr-2 h-4 w-4 text-indigo-600">
+                            <i class="fas fa-briefcase mr-2 text-indigo-500"></i> Indeed
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="source" value="linkedin" checked class="mr-2 h-4 w-4 text-indigo-600">
+                            <i class="fab fa-linkedin mr-2 text-blue-600"></i> LinkedIn
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="source" value="glassdoor" checked class="mr-2 h-4 w-4 text-indigo-600">
+                            <i class="fas fa-door-open mr-2 text-green-600"></i> Glassdoor
+                        </label>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label><input type="checkbox" id="notifyOnNewJobs" checked> Notify on new jobs</label>
+                <div class="mb-5">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="notifyOnNewJobs" checked class="mr-2 h-4 w-4 text-indigo-600">
+                        <span class="text-sm font-medium text-gray-700">Notify on new jobs</span>
+                    </label>
                 </div>
             </div>
             
-            <div class="results-panel">
-                <h2>Results</h2>
-                <div class="results-summary">
-                    <div>Total Jobs: <span id="totalJobs">0</span></div>
-                    <div>New Jobs: <span id="newJobs">0</span></div>
+            <!-- Results Panel -->
+            <div class="flex-1 p-5 overflow-hidden flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-indigo-700 flex items-center">
+                        <i class="fas fa-list mr-2"></i> Results
+                    </h2>
+                    <div class="flex space-x-6">
+                        <div class="bg-indigo-100 px-4 py-2 rounded-lg">
+                            <span class="text-indigo-800">Total Jobs:</span> 
+                            <span id="totalJobs" class="font-bold">0</span>
+                        </div>
+                        <div class="bg-green-100 px-4 py-2 rounded-lg">
+                            <span class="text-green-800">New Jobs:</span> 
+                            <span id="newJobs" class="font-bold">0</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="job-list-container">
-                    <div class="job-list-header">
-                        <div>Title</div>
+                <!-- Job List -->
+                <div class="flex-1 overflow-hidden flex flex-col border border-gray-200 rounded-lg shadow-sm">
+                    <div class="grid grid-cols-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium py-3 px-4">
+                        <div class="col-span-2">Title</div>
                         <div>Company</div>
                         <div>Location</div>
                         <div>Source</div>
                         <div>Status</div>
                     </div>
-                    <div class="job-list" id="jobList"></div>
+                    <div id="jobList" class="flex-1 overflow-y-auto bg-white">
+                        <!-- Jobs will be filled dynamically -->
+                    </div>
                 </div>
             </div>
         </div>
