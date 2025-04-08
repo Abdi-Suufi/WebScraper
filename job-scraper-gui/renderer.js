@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateJobList(currentJobs);
         document.getElementById('totalJobs').textContent = currentJobs.length;
         document.getElementById('newJobs').textContent = data.newJobsCount;
-    });
+      });
 });
 
 function startSearch() {

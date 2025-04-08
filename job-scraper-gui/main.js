@@ -1,3 +1,4 @@
+// main.js - Keep only main process code here
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const JobScraper = require('./jobScraper'); // Your existing JobScraper class
@@ -25,7 +26,7 @@ function createWindow() {
   });
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   createWindow();
   
   // Initialize config manager and load saved configuration
@@ -34,6 +35,34 @@ app.on('ready', () => {
   
   // Initialize scraper with saved config
   scraper = new JobScraper(savedConfig);
+  
+  // Wait for the window to finish loading before sending data and performing initial search
+  mainWindow.webContents.on('did-finish-load', async () => {
+    // Send the current config to the renderer
+    mainWindow.webContents.send('current-config', scraper.config);
+    
+    // Perform initial search
+    try {
+      // Set status to "Searching..."
+      mainWindow.webContents.send('status-update', 'Searching...');
+      
+      // Perform the search
+      await scraper.searchAllJobs();
+      
+      // Send the results to the renderer
+      const jobs = scraper.getAllJobs();
+      mainWindow.webContents.send('search-complete', {
+        success: true,
+        jobs: jobs,
+        newJobsCount: scraper.getNewJobsCount()
+      });
+    } catch (error) {
+      mainWindow.webContents.send('search-complete', {
+        success: false,
+        error: error.message
+      });
+    }
+  });
 });
 
 app.on('window-all-closed', function () {
