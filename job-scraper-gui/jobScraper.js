@@ -34,7 +34,7 @@ class JobScraper {
       }
     };
     
-    // Create save directory if it doesn't exist
+    // Ensure saveDirectory exists
     if (!fs.existsSync(this.config.saveDirectory)) {
       fs.mkdirSync(this.config.saveDirectory, { recursive: true });
     }

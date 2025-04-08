@@ -1,9 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const JobScraper = require('./jobScraper'); // Your existing JobScraper class
+const ConfigManager = require('./configManager'); // Our new ConfigManager class
 
 let mainWindow;
 let scraper;
+let configManager;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -26,15 +28,12 @@ function createWindow() {
 app.on('ready', () => {
   createWindow();
   
-  // Initialize scraper with default config
-  scraper = new JobScraper({
-    jobTypes: ['software developer', 'data analyst', 'frontend developer'],
-    locations: ['Bristol'],
-    sources: ['indeed', 'linkedin', 'glassdoor'],
-    saveDirectory: './job_results',
-    notifyOnNewJobs: true,
-    searchIntervalMinutes: 60
-  });
+  // Initialize config manager and load saved configuration
+  configManager = new ConfigManager();
+  const savedConfig = configManager.loadConfig();
+  
+  // Initialize scraper with saved config
+  scraper = new JobScraper(savedConfig);
 });
 
 app.on('window-all-closed', function () {
@@ -63,6 +62,10 @@ ipcMain.on('start-search', async (event) => {
 ipcMain.on('update-config', (event, newConfig) => {
   try {
     const updatedConfig = scraper.updateConfig(newConfig);
+    
+    // Save the updated configuration
+    configManager.saveConfig(updatedConfig);
+    
     event.reply('config-updated', { success: true, config: updatedConfig });
   } catch (error) {
     event.reply('config-updated', { success: false, error: error.message });
@@ -87,6 +90,11 @@ ipcMain.on('select-directory', async (event) => {
   });
   
   if (!result.canceled && result.filePaths.length > 0) {
-    event.reply('directory-selected', result.filePaths[0]);
+    const newDirectory = result.filePaths[0];
+    event.reply('directory-selected', newDirectory);
+    
+    // Save the directory to config when selected
+    const updatedConfig = scraper.updateConfig({ saveDirectory: newDirectory });
+    configManager.saveConfig(updatedConfig);
   }
 });
