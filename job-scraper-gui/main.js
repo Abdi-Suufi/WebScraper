@@ -1,5 +1,5 @@
 // main.js - Keep only main process code here
-const { app, BrowserWindow, ipcMain, dialog, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Tray, Menu, Notification } = require('electron');
 const path = require('path');
 const JobScraper = require('./jobScraper'); // Your existing JobScraper class
 const ConfigManager = require('./configManager'); // Our new ConfigManager class
@@ -13,6 +13,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+    minWidth: 1000,
+    minHeight: 700,
      icon: __dirname + '/icon.png',
     webPreferences: {
       nodeIntegration: true,
@@ -21,6 +23,7 @@ function createWindow() {
     }
   });
 
+  Menu.setApplicationMenu(null);
   mainWindow.loadFile('index.html');
 
   mainWindow.on('closed', function () {
@@ -93,10 +96,21 @@ app.on('ready', async () => {
       
       // Send the results to the renderer
       const jobs = scraper.getAllJobs();
+      const newJobsCount = scraper.getNewJobsCount();
+      
+      // Send notification about search results
+      new Notification({
+        title: 'Job Search Complete',
+        body: newJobsCount > 0 
+          ? `Found ${newJobsCount} new job${newJobsCount === 1 ? '' : 's'}!` 
+          : 'No new jobs found.',
+        icon: path.join(__dirname, 'icon.png')
+      }).show();
+      
       mainWindow.webContents.send('search-complete', {
         success: true,
         jobs: jobs,
-        newJobsCount: scraper.getNewJobsCount()
+        newJobsCount: newJobsCount
       });
     } catch (error) {
       mainWindow.webContents.send('search-complete', {
@@ -120,10 +134,21 @@ ipcMain.on('start-search', async (event) => {
   try {
     await scraper.searchAllJobs();
     const jobs = scraper.getAllJobs();
+    const newJobsCount = scraper.getNewJobsCount();
+    
+    // Send notification about search results
+    new Notification({
+      title: 'Job Search Complete',
+      body: newJobsCount > 0 
+        ? `Found ${newJobsCount} new job${newJobsCount === 1 ? '' : 's'}!` 
+        : 'No new jobs found.',
+      icon: path.join(__dirname, 'icon.png')
+    }).show();
+    
     event.reply('search-complete', { 
       success: true, 
       jobs: jobs,
-      newJobsCount: scraper.getNewJobsCount()
+      newJobsCount: newJobsCount
     });
   } catch (error) {
     event.reply('search-complete', { success: false, error: error.message });
