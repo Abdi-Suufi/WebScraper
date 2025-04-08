@@ -282,3 +282,48 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 500);
     }, 3000);
 }
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 600);
+    }
+}
+
+// Modify your existing IPC listener for search-complete
+ipcRenderer.on('search-complete', (event, result) => {
+    // Hide the loading overlay
+    hideLoadingOverlay();
+    
+    if (result.success) {
+        currentJobs = result.jobs;
+        updateJobList(currentJobs);
+        document.getElementById('totalJobs').textContent = currentJobs.length;
+        document.getElementById('newJobs').textContent = result.newJobsCount;
+        
+        const statusText = document.getElementById('statusText');
+        statusText.textContent = 'Search completed';
+        statusText.className = 'completed';
+        
+        // If this was an automatic search, schedule the next one
+        if (autoSearchInterval) {
+            const interval = parseInt(document.getElementById('searchInterval').value) || 60;
+            clearInterval(autoSearchInterval);
+            autoSearchInterval = setInterval(startSearch, interval * 60 * 1000);
+        }
+        
+        // Show notification for new jobs
+        if (result.newJobsCount > 0) {
+            showNotification(`Found ${result.newJobsCount} new job(s)!`);
+        }
+    } else {
+        // Even if there was an error, we still hide the loading overlay
+        const statusText = document.getElementById('statusText');
+        statusText.textContent = 'Error';
+        statusText.className = 'error';
+        console.error('Search error:', result.error);
+    }
+});

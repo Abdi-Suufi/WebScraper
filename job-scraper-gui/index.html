@@ -2,19 +2,35 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Job Scout</title>
+    <title>Job Scraper</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
+    <div id="loadingOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600">
+        <div class="mb-8">
+            <svg class="w-24 h-24 text-white" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" stroke-dasharray="157" stroke-dashoffset="0" class="animate-search-pulse">
+                </circle>
+                <path d="M 50 20 L 50 80 M 20 50 L 80 50" stroke="white" stroke-width="8" stroke-linecap="round"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-4">Job Scraper</h1>
+        <div class="bg-white/20 rounded-lg px-6 py-4 text-white text-center">
+            <p class="text-lg mb-2">Initializing job search...</p>
+            <div class="loading-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
+    </div>
     <div class="flex flex-col h-screen">
         <!-- Header/Navbar -->
         <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
             <div class="container mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center">
                     <i class="fas fa-search-dollar text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold">Job Scout</h1>
+                    <h1 class="text-xl font-bold">Job Scraper</h1>
                 </div>
                 <div class="flex items-center space-x-3">
                     <button id="startSearch" class="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow flex items-center">
