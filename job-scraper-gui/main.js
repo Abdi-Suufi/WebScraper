@@ -1,5 +1,5 @@
 // main.js - Keep only main process code here
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Tray, Menu } = require('electron');
 const path = require('path');
 const JobScraper = require('./jobScraper'); // Your existing JobScraper class
 const ConfigManager = require('./configManager'); // Our new ConfigManager class
@@ -7,11 +7,13 @@ const ConfigManager = require('./configManager'); // Our new ConfigManager class
 let mainWindow;
 let scraper;
 let configManager;
+let tray = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+     icon: __dirname + '/icon.png',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -23,6 +25,46 @@ function createWindow() {
 
   mainWindow.on('closed', function () {
     mainWindow = null;
+  });
+  mainWindow.on('close', function (event) {
+    if (!app.isQuiting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
+    return false;
+  });
+
+  // Create tray icon
+  createTray();
+}
+
+function createTray() {
+  // Path to your icon (create a 16x16 or 32x32 icon and save it in your project)
+  const iconPath = path.join(__dirname, 'icon.png'); // Make sure to add an icon.png file
+  
+  tray = new Tray(iconPath);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show App', 
+      click: function() {
+        mainWindow.show();
+      }
+    },
+    {
+      label: 'Quit',
+      click: function() {
+        app.isQuiting = true;
+        app.quit();
+      }
+    }
+  ]);
+  
+  tray.setToolTip('Job Scraper');
+  tray.setContextMenu(contextMenu);
+  
+  // Double click to show the window
+  tray.on('double-click', () => {
+    mainWindow.show();
   });
 }
 
