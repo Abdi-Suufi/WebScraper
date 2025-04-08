@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Job Scraper</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Scraper</h1>
+            <div class="controls">
+                <button id="startSearch">Start Search</button>
+                <button id="stopSearch">Stop Auto Search</button>
+                <div class="search-status">Status: <span id="statusText">Ready</span></div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="config-panel">
+                <h2>Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="searchInterval">Search Interval (minutes):</label>
+                    <input type="number" id="searchInterval" min="1" value="60">
+                </div>
+                
+                <div class="form-group">
+                    <label for="saveDirectory">Save Directory:</label>
+                    <div class="directory-selector">
+                        <input type="text" id="saveDirectory" readonly>
+                        <button id="selectDirectory">Browse</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Job Types:</label>
+                    <div class="list-container" id="jobTypesList"></div>
+                    <div class="add-item">
+                        <input type="text" id="newJobType" placeholder="New job type">
+                        <button id="addJobType">Add</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Locations:</label>
+                    <div class="list-container" id="locationsList"></div>
+                    <div class="add-item">
+                        <input type="text" id="newLocation" placeholder="New location">
+                        <button id="addLocation">Add</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sources:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="source" value="indeed" checked> Indeed</label>
+                        <label><input type="checkbox" name="source" value="linkedin" checked> LinkedIn</label>
+                        <label><input type="checkbox" name="source" value="glassdoor" checked> Glassdoor</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><input type="checkbox" id="notifyOnNewJobs" checked> Notify on new jobs</label>
+                </div>
+            </div>
+            
+            <div class="results-panel">
+                <h2>Results</h2>
+                <div class="results-summary">
+                    <div>Total Jobs: <span id="totalJobs">0</span></div>
+                    <div>New Jobs: <span id="newJobs">0</span></div>
+                </div>
+                
+                <div class="job-list-container">
+                    <div class="job-list-header">
+                        <div>Title</div>
+                        <div>Company</div>
+                        <div>Location</div>
+                        <div>Source</div>
+                        <div>Status</div>
+                    </div>
+                    <div class="job-list" id="jobList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,2 +1,49 @@
 job_results.json
 job_results/
+
+# Node.js dependencies
+node_modules/
+
+# Electron and build artifacts
+dist/
+out/
+release-builds/
+*.exe
+*.dmg
+*.deb
+*.snap
+
+# Job results data (from your saveDirectory)
+job_results/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+electron-debug.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

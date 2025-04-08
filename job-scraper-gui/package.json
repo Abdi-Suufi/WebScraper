@@ -1,0 +1,20 @@
+{
+  "name": "job-scraper-gui",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
+    "electron": "^35.1.4",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  }
+}
