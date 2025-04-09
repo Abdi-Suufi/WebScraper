@@ -1,4 +1,4 @@
-# Job Scraper GUI
+# Job Scraper
 
 ![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
