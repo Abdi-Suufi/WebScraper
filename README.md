@@ -23,7 +23,7 @@ A cross-platform desktop application for scraping and managing job listings from
 - Git (for development)
 
 ### Installation
-```bash
+```bash 
 # Clone the repository
 git clone https://github.com/Abdi-Suufi/WebScraper.git
 
