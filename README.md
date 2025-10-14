@@ -1,4 +1,4 @@
-# Job Scraper GUI
+# Job Scraper
 
 ![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
@@ -23,7 +23,7 @@ A cross-platform desktop application for scraping and managing job listings from
 - Git (for development)
 
 ### Installation
-```bash
+```bash 
 # Clone the repository
 git clone https://github.com/Abdi-Suufi/WebScraper.git
 
