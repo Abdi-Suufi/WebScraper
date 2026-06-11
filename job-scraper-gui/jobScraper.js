@@ -474,18 +474,18 @@ async function startAutomaticJobSearch(config) {
   console.log('  jobs - Show summary of all jobs found');
 }
 
-// Configuration
-const config = {
-  jobTypes: ['software developer', 'data analyst', 'frontend developer'], // Multiple job types to search for
-  locations: ['Bristol'], // Multiple locations to search in
-  sources: ['indeed', 'linkedin', 'glassdoor'], // Sources to search
-  saveDirectory: './job_results', // Directory to save results
-  notifyOnNewJobs: true, // Whether to print new jobs in console
-  searchIntervalMinutes: 60 // How often to search (in minutes)
-};
+if (require.main === module) {
+  const config = {
+    jobTypes: ['software developer', 'data analyst', 'frontend developer'],
+    locations: ['Bristol'],
+    sources: ['indeed', 'linkedin', 'glassdoor'],
+    saveDirectory: './job_results',
+    notifyOnNewJobs: true,
+    searchIntervalMinutes: 60
+  };
 
-// Start the automatic job search
-startAutomaticJobSearch(config);
+  startAutomaticJobSearch(config);
+}
 
 /* 
   To manage job types while the program is running:
