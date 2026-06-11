@@ -1,6 +1,6 @@
 {
   "name": "job-scraper-gui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatic job search web scraper",
   "main": "main.js",
   "scripts": {
