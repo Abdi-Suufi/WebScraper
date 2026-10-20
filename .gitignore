@@ -3,6 +3,13 @@ job_results/
 
 # Node.js dependencies
 node_modules/
+job-scraper-gui/node_modules/
+job-scraper-gui/release/
+job-scraper-gui/out/
+job-scraper-gui/.env
+job-scraper-gui/.env.*
+job-scraper-gui/job-search-data.json
+job-scraper-gui/job-search-data.json.tmp
 
 # Electron and build artifacts
 dist/
